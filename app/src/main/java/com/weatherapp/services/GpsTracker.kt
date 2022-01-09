@@ -184,30 +184,6 @@ class GpsTracker(private val mContext: Context) : Service(), LocationListener {
         return canGetLocation
     }
 
-    /**
-     * Function to show settings alert dialog
-     * On pressing Settings button will lauch Settings Options
-     */
-    fun showSettingsAlert() {
-        val alertDialog: AlertDialog.Builder = Builder(mContext)
-
-        // Setting Dialog Title
-        alertDialog.setTitle("GPS is settings")
-
-        // Setting Dialog Message
-        alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?")
-
-        // On pressing Settings button
-        alertDialog.setPositiveButton("Settings", DialogInterface.OnClickListener { dialog, which ->
-            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            mContext.startActivity(intent)
-        })
-
-        // on pressing cancel button
-        alertDialog.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
-        alertDialog.show()
-    }
-
     override fun onLocationChanged(location: Location) {}
     override fun onProviderDisabled(provider: String) {}
     override fun onProviderEnabled(provider: String) {}

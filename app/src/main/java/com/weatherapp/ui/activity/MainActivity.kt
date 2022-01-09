@@ -2,14 +2,10 @@ package com.weatherapp.ui.activity
 
 import android.Manifest
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
+import androidx.appcompat.app.AppCompatActivity
 import com.weatherapp.R
 import com.weatherapp.databinding.ActivityMainBinding
 import com.weatherapp.services.GpsTracker
@@ -25,6 +21,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: WeatherViewModel by viewModels()
+    private lateinit var gpsTracker: GpsTracker
 
     companion object {
         private val TAG = MainActivity::class.simpleName
@@ -41,6 +38,12 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
     private fun initComponents() {
         setSupportActionBar(binding.toolbar)
         requestPermissions()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::gpsTracker.isInitialized)
+            gpsTracker.stopUsingGPS()
     }
 
     //Checking for location permission
@@ -85,7 +88,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     //Fetching the location and saving weather based on that location in database
     private fun fetchLocation() {
-        val gpsTracker = GpsTracker(this)
+        gpsTracker = GpsTracker(this)
         if (gpsTracker.canGetLocation()) {
             Log.e(TAG, "Lat : ${gpsTracker.getLatitude()} Long : ${gpsTracker.getLongitude()}")
             viewModel.fetchWeatherDetails(gpsTracker.getLatitude().toString(), gpsTracker.getLongitude().toString())
