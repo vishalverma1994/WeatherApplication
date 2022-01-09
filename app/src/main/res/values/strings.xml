@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="save">Save</string>
+    <string name="location_permission_message">You need to accept location permissions to use this app.</string>
+    <string name="search">Search</string>
+    <string name="temp"><b>Temperature:</b> %s</string>
+    <string name="date"><b>Date:</b> %s</string>
+    <string name="desc"><b>Description:</b> %s</string>
+    <string name="wind_speed"><b>Wind Speed:</b> %s</string>
+    <string name="country"><b>Country:</b> %s</string>
+    <string name="more_details">More Details</string>
+    <string name="no_data_found">No Data Found.</string>
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/app_navigation"
+    app:startDestination="@id/weatherDashboardFragment">
+
+    <fragment
+        android:id="@+id/weatherDashboardFragment"
+        android:name="com.weatherapp.ui.fragments.WeatherDashboardFragment"
+        android:label="fragment_dashboard"
+        tools:layout="@layout/fragment_weather_dashboard">
+
+        <action
+            android:id="@+id/action_myHomeFragment_to_mySecondFragment"
+            app:destination="@id/weatherDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/weatherDetailFragment"
+        android:name="com.weatherapp.ui.fragments.WeatherDetailFragment"
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_weather_dashboard">
+        <argument
+            android:name="weatherId"
+            app:argType="integer"
+            android:defaultValue="0"/>
+
+    </fragment>
+
+</navigation>
