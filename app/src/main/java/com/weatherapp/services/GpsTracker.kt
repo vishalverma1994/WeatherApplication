@@ -65,15 +65,26 @@ class GpsTracker(private val mContext: Context) : Service(), LocationListener {
                 // First get location from Network Provider
                 if (isNetworkEnabled) {
                     //check the network permission
-                    if (ActivityCompat.checkSelfPermission(mContext, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(mContext, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions((mContext as Activity), arrayOf(permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION),
-                            Constants.REQUEST_CODE_LOCATION_PERMISSION)
+                    if (ActivityCompat.checkSelfPermission(
+                            mContext,
+                            permission.ACCESS_FINE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(
+                            mContext,
+                            permission.ACCESS_COARSE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        ActivityCompat.requestPermissions(
+                            (mContext as Activity),
+                            arrayOf(permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION),
+                            Constants.REQUEST_CODE_LOCATION_PERMISSION
+                        )
                     }
                     locationManager.requestLocationUpdates(
                         LocationManager.NETWORK_PROVIDER,
                         MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this)
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
+                    )
                     Log.d("Network", "Network")
                     if (::locationManager.isInitialized) {
                         locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)?.let {
@@ -90,15 +101,26 @@ class GpsTracker(private val mContext: Context) : Service(), LocationListener {
                 if (isGPSEnabled) {
                     if (!::location.isInitialized) {
                         //check the network permission
-                        if (ActivityCompat.checkSelfPermission(mContext, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                            && ActivityCompat.checkSelfPermission(mContext, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions((mContext as Activity), arrayOf(permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION),
-                                Constants.REQUEST_CODE_LOCATION_PERMISSION)
+                        if (ActivityCompat.checkSelfPermission(
+                                mContext,
+                                permission.ACCESS_FINE_LOCATION
+                            ) != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(
+                                mContext,
+                                permission.ACCESS_COARSE_LOCATION
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            ActivityCompat.requestPermissions(
+                                (mContext as Activity),
+                                arrayOf(permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION),
+                                Constants.REQUEST_CODE_LOCATION_PERMISSION
+                            )
                         }
                         locationManager.requestLocationUpdates(
                             LocationManager.GPS_PROVIDER,
                             MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this)
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
+                        )
                         Log.d("GPS Enabled", "GPS Enabled")
                         if (::locationManager.isInitialized) {
                             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let {

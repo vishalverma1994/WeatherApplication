@@ -27,11 +27,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<provider
+        <provider
             android:name=".contentprovider.WeatherContentProvider"
-            android:authorities="com.weatherapp.contentprovider.WeatherContentProvider"
+            android:authorities="com.weatherapp.contentprovider"
+            android:permission="com.example.android.contentprovidersample.provider.READ_WRITE"
             android:enabled="true"
-            android:exported="true" />-->
+            android:exported="true" />
     </application>
 
 </manifest>

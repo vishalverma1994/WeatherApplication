@@ -22,6 +22,15 @@ import com.weatherapp.utils.Constants
 import com.weatherapp.utils.Status
 import com.weatherapp.viewmodel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import android.widget.Toast
+
+import android.app.ListActivity
+
+import androidx.recyclerview.widget.RecyclerView
+
+import androidx.recyclerview.widget.ItemTouchHelper
+import com.weatherapp.utils.CheckPermissions
+
 
 @AndroidEntryPoint
 class WeatherDashboardFragment : Fragment() {
@@ -43,12 +52,6 @@ class WeatherDashboardFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        Log.e(TAG, "onCreate Called")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.e(TAG, "onDetach Called")
     }
 
     override fun onCreateView(
@@ -68,7 +71,7 @@ class WeatherDashboardFragment : Fragment() {
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
         if (searchItem != null) {
             searchView = searchItem.actionView as SearchView
-            searchView.queryHint = "Search By City Name.."
+            searchView.queryHint = getString(R.string.search_message)
         }
 
         if (::searchView.isInitialized) {
@@ -98,23 +101,33 @@ class WeatherDashboardFragment : Fragment() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.weatherDashboardFragment -> {
-                    saveItem?.isVisible = true
-                    searchItem?.isVisible = true
+                    handleMenuItems(saveItem, searchItem, true)
                 }
-                else ->  {
-                    saveItem?.isVisible = false
-                    searchItem?.isVisible = false
+                else -> {
+                    handleMenuItems(saveItem, searchItem, false)
                 }
             }
         }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             //on save menu item click
             R.id.action_save -> {
-                weatherViewModel.getAllWeatherList()
+                if (!CheckPermissions.hasLocationPermissions(requireContext()) ||
+                    (::weatherList.isInitialized && weatherList.isEmpty())
+                ) {
+                    val gpsTracker = GpsTracker(requireContext())
+                    if (gpsTracker.canGetLocation()) {
+                        Log.e(TAG, "Lat : ${gpsTracker.getLatitude()} Long : ${gpsTracker.getLongitude()}")
+                        weatherViewModel.fetchWeatherDetails(
+                            gpsTracker.getLatitude().toString(),
+                            gpsTracker.getLongitude().toString()
+                        )
+                    }
+                } else weatherViewModel.getAllWeatherList()
                 false
             }
             else -> {
@@ -130,11 +143,40 @@ class WeatherDashboardFragment : Fragment() {
         observeWeatherLiveData()
     }
 
+    //handle menu items visibility
+    private fun handleMenuItems(saveItem: MenuItem?, searchItem: MenuItem?, flag: Boolean) {
+        saveItem?.isVisible = flag
+        searchItem?.isVisible = flag
+    }
+
     //set the adapter with recyclerview
     private fun setWeatherAdapter() {
         binding.rvWeather.apply {
             weatherAdapter = WeatherAdapter(::onWeatherSelected)
             adapter = weatherAdapter
+            val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
+            itemTouchHelper.attachToRecyclerView(this)
+        }
+    }
+
+    //swipe to delete feature
+    private val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
+        0,
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+            //Remove swiped item from list and notify the RecyclerView
+            val position = viewHolder.absoluteAdapterPosition
+            weatherViewModel.deleteWeather(weatherList[position])
+            weatherList.remove(weatherList[position])
         }
     }
 
@@ -163,11 +205,6 @@ class WeatherDashboardFragment : Fragment() {
                     }
                     weatherAdapter.submitList(this.weatherList)
                 } else {
-                    val gpsTracker = GpsTracker(requireContext())
-                    if (gpsTracker.canGetLocation()) {
-                        Log.e(TAG, "Lat : ${gpsTracker.getLatitude()} Long : ${gpsTracker.getLongitude()}")
-                        weatherViewModel.fetchWeatherDetails(gpsTracker.getLatitude().toString(), gpsTracker.getLongitude().toString())
-                    }
                     binding.rvWeather.visibility = View.GONE
                     binding.tvEmptyStatement.visibility = View.VISIBLE
                 }
@@ -175,13 +212,14 @@ class WeatherDashboardFragment : Fragment() {
         })
     }
 
+    //perform search by city name through API
     private fun performSearch(query: String) {
         weatherViewModel.searchForWeather(query)
     }
 
     private fun observeWeatherLiveData() {
         weatherViewModel.weatherLiveData.observe(this, {
-            when(it.status) {
+            when (it.status) {
                 Status.LOADING -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }

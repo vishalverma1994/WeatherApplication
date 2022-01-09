@@ -10,6 +10,7 @@ object Constants {
 
     /** The authority for content provider.  */
     const val AUTHORITY = "com.weatherapp.contentprovider.WeatherContentProvider"
+
     /** The URI for the weather table.  */
     val URI_MENU = Uri.parse(
         "content://$AUTHORITY/weather"

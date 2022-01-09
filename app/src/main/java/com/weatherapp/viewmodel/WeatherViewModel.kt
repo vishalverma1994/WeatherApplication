@@ -68,4 +68,8 @@ class WeatherViewModel @Inject constructor(
     fun getWeatherDetail(weatherId: Int): LiveData<WeatherEntity> {
         return repository.getWeatherDetail(weatherId)
     }
+
+    fun deleteWeather(weatherEntity: WeatherEntity) = viewModelScope.launch {
+        repository.deleteWeather(weatherEntity)
+    }
 }
